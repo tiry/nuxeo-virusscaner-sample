@@ -103,11 +103,12 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
 
                  if (!failed) {
                      doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP, VirusScanConsts.VIRUSSCAN_STATUS_DONE);
+                     doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP, true);
                  } else {
                      doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP, VirusScanConsts.VIRUSSCAN_STATUS_FAILED);
+                     doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP, false);
                  }
                  doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_INFO_PROP, scanInfo.toString());
-                 doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP, true);
                  doc.putContextData(VirusScanConsts.DISABLE_VIRUSSCAN_LISTENER, true);
                  doc.getCoreSession().saveDocument(doc);
             }

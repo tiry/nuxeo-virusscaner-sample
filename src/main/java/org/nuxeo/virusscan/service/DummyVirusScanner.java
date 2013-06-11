@@ -14,6 +14,9 @@ public class DummyVirusScanner implements ScanService {
     public ScanResult scanBlob(Blob blob) throws ClientException {
         if (blob!=null) {
             doneFiles.add(blob.getFilename());
+            if (blob.getFilename().contains("doFail")) {
+                throw new ClientException("Virus Scanner not available");
+            }
             return new ScanResult(false, "No virus found in " + blob.getFilename());
         } else {
             return new ScanResult(false, "No file found");

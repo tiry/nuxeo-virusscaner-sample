@@ -57,6 +57,7 @@ public class TestDummyVirusScanner {
 
         DocumentModel file;
         DocumentModel file2;
+        DocumentModel file3;
 
         TransactionHelper.startTransaction();
         try {
@@ -79,20 +80,28 @@ public class TestDummyVirusScanner {
 
             file2.setPropertyValue("file:content", (Serializable) getFakeBlob(1001, "Test2.txt"));
             file2 = session.saveDocument(file2);
+
+            file3 = session.createDocumentModel("/", "file3",
+                    "File");
+            file3.setPropertyValue("file:content", (Serializable) getFakeBlob(100, "Test3doFail.txt"));
+            file3 = session.createDocument(file3);
+
+
             session.save();
         } finally {
             TransactionHelper.commitOrRollbackTransaction();
         }
 
-        Thread.sleep(4000);
-
-        //eventService.waitForAsyncCompletion(4000);
+        // wait for processing to be done
+        Thread.sleep(1000);
+        //eventService.waitForAsyncCompletion(5000);
         workManager.awaitCompletion(10, TimeUnit.SECONDS);
 
         List<String> scannedFiles = DummyVirusScanner.getProcessedFiles();
 
         Assert.assertTrue(scannedFiles.contains("Test1.txt"));
         Assert.assertTrue(scannedFiles.contains("Test2.txt"));
+        Assert.assertTrue(scannedFiles.contains("Test3doFail.txt"));
 
         session.save();
 
@@ -101,15 +110,19 @@ public class TestDummyVirusScanner {
 
             file = session.getDocument(file.getRef());
             file2 = session.getDocument(file2.getRef());
+            file3 = session.getDocument(file3.getRef());
 
             Assert.assertTrue(file.hasFacet(VirusScanConsts.VIRUSSCAN_FACET));
             Assert.assertTrue(file2.hasFacet(VirusScanConsts.VIRUSSCAN_FACET));
+            Assert.assertTrue(file3.hasFacet(VirusScanConsts.VIRUSSCAN_FACET));
 
             Assert.assertTrue((Boolean)file.getPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP));
             Assert.assertTrue((Boolean)file2.getPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP));
+            Assert.assertFalse((Boolean)file3.getPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP));
 
             Assert.assertEquals(VirusScanConsts.VIRUSSCAN_STATUS_DONE,file.getPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP));
             Assert.assertEquals(VirusScanConsts.VIRUSSCAN_STATUS_DONE,file2.getPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP));
+            Assert.assertEquals(VirusScanConsts.VIRUSSCAN_STATUS_FAILED,file3.getPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP));
 
         } finally {
             TransactionHelper.commitOrRollbackTransaction();
