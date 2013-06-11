@@ -1,7 +1,10 @@
 package org.nuxeo.virusscan.test;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
@@ -58,6 +61,7 @@ public class TestDummyVirusScanner {
         DocumentModel file;
         DocumentModel file2;
         DocumentModel file3;
+        DocumentModel file4;
 
         TransactionHelper.startTransaction();
         try {
@@ -92,6 +96,52 @@ public class TestDummyVirusScanner {
             TransactionHelper.commitOrRollbackTransaction();
         }
 
+        TransactionHelper.startTransaction();
+        try {
+            file4 = session.createDocumentModel("/", "file4",
+                    "File");
+            file4.setPropertyValue("file:content", (Serializable) getFakeBlob(100, "Test4.txt"));
+            file4 = session.createDocument(file4);
+            session.save();
+        } finally {
+            TransactionHelper.commitOrRollbackTransaction();
+        }
+
+        TransactionHelper.startTransaction();
+        try {
+
+            List<Map<String, Serializable>> files = new ArrayList<Map<String, Serializable>>();
+
+            for (int i = 0; i < 5; i++) {
+                Map<String, Serializable> map = new HashMap<String, Serializable>();
+                map.put("file", (Serializable) getFakeBlob(100, "Test4-" + i + ".txt"));
+                map.put("filename",  "Test4-" + i + ".txt");
+                files.add(map);
+            }
+
+            file4.setPropertyValue("files:files", (Serializable)files);
+            file4 = session.saveDocument(file4);
+            session.save();
+        } finally {
+            TransactionHelper.commitOrRollbackTransaction();
+        }
+
+        TransactionHelper.startTransaction();
+        try {
+
+            List<Map<String, Serializable>> files = (List<Map<String, Serializable>>) file4.getPropertyValue("files:files");
+
+            Map<String, Serializable> map = new HashMap<String, Serializable>();
+            map.put("file", (Serializable) getFakeBlob(100, "Test4-b.txt"));
+            map.put("filename",  "Test4-b.txt");
+            files.add(map);
+            file4.setPropertyValue("files:files", (Serializable)files);
+            file4 = session.saveDocument(file4);
+            session.save();
+        } finally {
+            TransactionHelper.commitOrRollbackTransaction();
+        }
+
         // wait for processing to be done
         Thread.sleep(1000);
         //eventService.waitForAsyncCompletion(5000);
@@ -102,6 +152,15 @@ public class TestDummyVirusScanner {
         Assert.assertTrue(scannedFiles.contains("Test1.txt"));
         Assert.assertTrue(scannedFiles.contains("Test2.txt"));
         Assert.assertTrue(scannedFiles.contains("Test3doFail.txt"));
+        Assert.assertTrue(scannedFiles.contains("Test4.txt"));
+
+        System.out.println(DummyVirusScanner.getProcessedFiles());
+
+        for (int i =0; i <5; i++) {
+            Assert.assertTrue(scannedFiles.contains("Test4-" + i + ".txt"));
+        }
+
+        Assert.assertTrue(scannedFiles.contains("Test4-b.txt"));
 
         session.save();
 
