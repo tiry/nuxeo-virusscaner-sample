@@ -84,7 +84,7 @@ public class TestDummyVirusScanner {
             TransactionHelper.commitOrRollbackTransaction();
         }
 
-        //Thread.sleep(4000);
+        Thread.sleep(4000);
 
         //eventService.waitForAsyncCompletion(4000);
         workManager.awaitCompletion(10, TimeUnit.SECONDS);
@@ -94,8 +94,8 @@ public class TestDummyVirusScanner {
         Assert.assertTrue(scannedFiles.contains("Test1.txt"));
         Assert.assertTrue(scannedFiles.contains("Test2.txt"));
 
-
         session.save();
+
         TransactionHelper.startTransaction();
         try {
 
@@ -105,16 +105,15 @@ public class TestDummyVirusScanner {
             Assert.assertTrue(file.hasFacet(VirusScanConsts.VIRUSSCAN_FACET));
             Assert.assertTrue(file2.hasFacet(VirusScanConsts.VIRUSSCAN_FACET));
 
-            //Assert.assertTrue((Boolean)file.getPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP));
-            //Assert.assertTrue((Boolean)file2.getPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP));
+            Assert.assertTrue((Boolean)file.getPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP));
+            Assert.assertTrue((Boolean)file2.getPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP));
 
-            //Assert.assertEquals(VirusScanConsts.VIRUSSCAN_STATUS_DONE,file.getPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP));
-            //Assert.assertEquals(VirusScanConsts.VIRUSSCAN_STATUS_DONE,file2.getPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP));
+            Assert.assertEquals(VirusScanConsts.VIRUSSCAN_STATUS_DONE,file.getPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP));
+            Assert.assertEquals(VirusScanConsts.VIRUSSCAN_STATUS_DONE,file2.getPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP));
 
         } finally {
             TransactionHelper.commitOrRollbackTransaction();
         }
-
 
         System.out.println(DummyVirusScanner.getProcessedFiles());
 

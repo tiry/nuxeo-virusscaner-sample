@@ -25,10 +25,15 @@ public class VirusScanSyncListener implements EventListener {
     @Override
     public void handleEvent(Event event) throws ClientException {
 
-
         if (event.getContext() instanceof DocumentEventContext) {
             DocumentEventContext docCtx = (DocumentEventContext) event.getContext();
             DocumentModel targetDoc = docCtx.getSourceDocument();
+
+            Boolean block = (Boolean) event.getContext().getProperty(VirusScanConsts.DISABLE_VIRUSSCAN_LISTENER);
+            if (block != null && block) {
+                // ignore the event - we are blocked by the caller
+                return;
+            }
 
             List<String> propertiesPath = null;
 

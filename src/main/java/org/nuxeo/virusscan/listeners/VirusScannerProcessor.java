@@ -108,9 +108,8 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
                  }
                  doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_INFO_PROP, scanInfo.toString());
                  doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP, true);
-
+                 doc.putContextData(VirusScanConsts.DISABLE_VIRUSSCAN_LISTENER, true);
                  doc.getCoreSession().saveDocument(doc);
-
             }
         }
 

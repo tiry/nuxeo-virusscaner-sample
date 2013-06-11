@@ -20,4 +20,6 @@ public class VirusScanConsts {
 
     public static final String VIRUSSCAN_OK_PROP = "vscan:virusFree";
 
+    public static final String DISABLE_VIRUSSCAN_LISTENER = "disableVirusScanListener";
+
 }
