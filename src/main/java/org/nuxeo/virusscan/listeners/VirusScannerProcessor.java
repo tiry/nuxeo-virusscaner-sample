@@ -9,6 +9,7 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventBundle;
+import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.virusscan.AbstractLongRunningListener;
 import org.nuxeo.virusscan.VirusScanConsts;
@@ -31,7 +32,7 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
 
         for (Event event : events){
             if (VirusScanConsts.VIRUS_SCAN_NEEDED_EVENT.equals(event.getName())) {
-                 VirusScanEventContext vContext = (VirusScanEventContext) event.getContext();
+                 VirusScanEventContext vContext = VirusScanEventContext.unwrap((DocumentEventContext)event.getContext());
                  DocumentModel doc = vContext.getSourceDocument();
 
                  String key = doc.getRepositoryName() + ":" + doc.getId();
@@ -80,7 +81,7 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
 
         for (Event event : events){
             if (VirusScanConsts.VIRUS_SCAN_NEEDED_EVENT.equals(event.getName())) {
-                 VirusScanEventContext vContext = (VirusScanEventContext) event.getContext();
+                 VirusScanEventContext vContext = VirusScanEventContext.unwrap((DocumentEventContext) event.getContext());
                  DocumentModel doc = vContext.getSourceDocument();
 
                  String key = doc.getRepositoryName() + ":" + doc.getId();
@@ -89,7 +90,6 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
                  StringBuilder scanInfo = new StringBuilder();
                  if (results!=null && results.size()>0) {
                      scanInfo = new StringBuilder();
-                     boolean scanOk = true;
                      for (String path : results.keySet()) {
                          ScanResult res = results.get(path);
                          if (res.isVirusDetected()) {
@@ -107,6 +107,10 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
                      doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_STATUS_PROP, VirusScanConsts.VIRUSSCAN_STATUS_FAILED);
                  }
                  doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_INFO_PROP, scanInfo.toString());
+                 doc.setPropertyValue(VirusScanConsts.VIRUSSCAN_OK_PROP, true);
+
+                 doc.getCoreSession().saveDocument(doc);
+
             }
         }
 

@@ -11,8 +11,10 @@ import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventListener;
+import org.nuxeo.ecm.core.event.EventService;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.core.utils.BlobsExtractor;
+import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.virusscan.VirusScanConsts;
 
 public class VirusScanSyncListener implements EventListener {
@@ -24,7 +26,7 @@ public class VirusScanSyncListener implements EventListener {
     public void handleEvent(Event event) throws ClientException {
 
 
-        if (event instanceof DocumentEventContext) {
+        if (event.getContext() instanceof DocumentEventContext) {
             DocumentEventContext docCtx = (DocumentEventContext) event.getContext();
             DocumentModel targetDoc = docCtx.getSourceDocument();
 
@@ -44,7 +46,9 @@ public class VirusScanSyncListener implements EventListener {
 
             if (propertiesPath!=null && propertiesPath.size()>0) {
                 VirusScanEventContext virusScanCtx = new VirusScanEventContext(docCtx, propertiesPath);
-                virusScanCtx.newVirusScanEvent();
+
+                EventService eventService = Framework.getLocalService(EventService.class);
+                eventService.fireEvent(virusScanCtx.newVirusScanEvent());
             }
         }
     }

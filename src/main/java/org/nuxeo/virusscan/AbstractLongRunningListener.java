@@ -50,9 +50,10 @@ public abstract class AbstractLongRunningListener implements
 
             boolean doContinue = false;
             // do pre-processing and commit transaction
+            ReconnectedEventBundleImpl preProcessBunle = new ReconnectedEventBundleImpl(events);
             try {
                 doContinue = handleEventPreprocessing(
-                        new ReconnectedEventBundleImpl(events), data);
+                        preProcessBunle, data);
             } catch (ClientException e) {
                 log.error(
                         "Long Running listener canceled after failed execution of preprocessing",
@@ -60,6 +61,7 @@ public abstract class AbstractLongRunningListener implements
                 throw e;
             } finally {
                 TransactionHelper.commitOrRollbackTransaction();
+                preProcessBunle.disconnect();
             }
             if (!doContinue) {
                 return;
@@ -76,15 +78,16 @@ public abstract class AbstractLongRunningListener implements
                         e);
                 throw e;
             } finally {
-                //
+                ((ReconnectedEventBundleImpl) events).disconnect();
             }
 
             // do final-processing in a new transaction
             // a new CoreSession will be open by ReconnectedEventBundleImpl
+            ReconnectedEventBundleImpl postProcessEventBundle = new ReconnectedEventBundleImpl(events);
             try {
                 TransactionHelper.startTransaction();
                 handleEventPostprocessing(
-                        new ReconnectedEventBundleImpl(events), data);
+                        postProcessEventBundle , data);
             } catch (ClientException e) {
                 log.error(
                         "Long Running listener canceled after failed execution of main run",
@@ -92,6 +95,7 @@ public abstract class AbstractLongRunningListener implements
                 throw e;
             } finally {
                 TransactionHelper.commitOrRollbackTransaction();
+                postProcessEventBundle.disconnect();
             }
         } else {
             log.error("Unable to execute long running listener, input EventBundle is not a ReconnectedEventBundle");

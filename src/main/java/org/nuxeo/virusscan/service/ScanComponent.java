@@ -42,7 +42,7 @@ public class ScanComponent extends DefaultComponent {
     @Override
     public <T> T getAdapter(Class<T> adapter) {
 
-        if (adapter.getClass().getName().equals(ScanService.class.getName())) {
+        if (adapter.getName().equals(ScanService.class.getName())) {
             return adapter.cast(new DummyVirusScanner());
         }
         return super.getAdapter(adapter);
