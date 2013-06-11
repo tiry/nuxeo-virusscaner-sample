@@ -1,3 +1,21 @@
+/*
+ * (C) Copyright 2006-2013 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Nuxeo - initial API and implementation
+ *
+ */
+
 package org.nuxeo.virusscan;
 
 import java.util.HashMap;
@@ -50,10 +68,10 @@ public abstract class AbstractLongRunningListener implements
 
             boolean doContinue = false;
             // do pre-processing and commit transaction
-            ReconnectedEventBundleImpl preProcessBunle = new ReconnectedEventBundleImpl(events);
+            ReconnectedEventBundleImpl preProcessBunle = new ReconnectedEventBundleImpl(
+                    events);
             try {
-                doContinue = handleEventPreprocessing(
-                        preProcessBunle, data);
+                doContinue = handleEventPreprocessing(preProcessBunle, data);
             } catch (ClientException e) {
                 log.error(
                         "Long Running listener canceled after failed execution of preprocessing",
@@ -70,7 +88,8 @@ public abstract class AbstractLongRunningListener implements
             // do main-processing in a non transactional context
             // a new CoreSession will be open by ReconnectedEventBundleImpl
             try {
-                handleEventLongRunning(((ReconnectedEventBundleImpl) events).getEventNames(),
+                handleEventLongRunning(
+                        ((ReconnectedEventBundleImpl) events).getEventNames(),
                         data);
             } catch (ClientException e) {
                 log.error(
@@ -83,11 +102,11 @@ public abstract class AbstractLongRunningListener implements
 
             // do final-processing in a new transaction
             // a new CoreSession will be open by ReconnectedEventBundleImpl
-            ReconnectedEventBundleImpl postProcessEventBundle = new ReconnectedEventBundleImpl(events);
+            ReconnectedEventBundleImpl postProcessEventBundle = new ReconnectedEventBundleImpl(
+                    events);
             try {
                 TransactionHelper.startTransaction();
-                handleEventPostprocessing(
-                        postProcessEventBundle , data);
+                handleEventPostprocessing(postProcessEventBundle, data);
             } catch (ClientException e) {
                 log.error(
                         "Long Running listener canceled after failed execution of main run",
@@ -115,8 +134,10 @@ public abstract class AbstractLongRunningListener implements
 
     /**
      * Will be executed in a non transactional context
-     * <p/> Any acess to a CoreSession will generate WARN in the the logs.
-     * <p/>  Documents passed with data should not be connected.
+     * <p/>
+     * Any acess to a CoreSession will generate WARN in the the logs.
+     * <p/>
+     * Documents passed with data should not be connected.
      *
      * @param eventNames list of event names
      * @param data an map that may have been filled by handleEventPreprocessing
@@ -129,7 +150,8 @@ public abstract class AbstractLongRunningListener implements
      * Finish processing in a dedicated Transaction
      *
      * @param events {@link EventBundle} received
-     * @param data an map that may have been filled by handleEventPreprocessing and handleEventLongRunning
+     * @param data an map that may have been filled by handleEventPreprocessing
+     *            and handleEventLongRunning
      * @throws ClientException
      */
     protected abstract void handleEventPostprocessing(EventBundle events,

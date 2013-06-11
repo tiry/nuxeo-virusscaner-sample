@@ -1,5 +1,5 @@
 /*
- * (C) Copyright ${year} Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2013 Nuxeo SAS (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -12,40 +12,43 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
+ *     Nuxeo - initial API and implementation
+ *
  */
 
 package org.nuxeo.virusscan.service;
-import org.nuxeo.runtime.model.ComponentContext;
-import org.nuxeo.runtime.model.DefaultComponent;
 
+import org.nuxeo.runtime.model.DefaultComponent;
 
 /**
  * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
  */
 public class ScanComponent extends DefaultComponent {
 
-    /**
-     * Application started notification.
-     * Called after the application started.
-     * You can do here any initialization that requires a working application
-     * (all resolved bundles and components are active at that moment)
-     *
-     * @param context the component context. Use it to get the current bundle context
-     * @throws Exception
-     */
-    @Override
-    public void applicationStarted(ComponentContext context) throws Exception {
-        // do nothing by default. You can remove this method if not used.
-    }
+    protected ScanService scanService;
 
     @Override
     public <T> T getAdapter(Class<T> adapter) {
 
+        if (true) {
+            return adapter.cast(getScanService());
+        }
+
         if (adapter.getName().equals(ScanService.class.getName())) {
-            return adapter.cast(new DummyVirusScanner());
+            return adapter.cast(getScanService());
         }
         return super.getAdapter(adapter);
     }
 
+    /**
+     * build the scanService singleton instance.
+     *
+     * @return
+     */
+    protected ScanService getScanService() {
+        if (scanService == null) {
+            scanService = new DummyVirusScanner();
+        }
+        return scanService;
+    }
 }

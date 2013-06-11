@@ -1,10 +1,10 @@
 /*
- * (C) Copyright 2006-2012 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2006-2013 Nuxeo SAS (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
  * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * http://www.gnu.org/licenses/lgpl.html
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,24 +12,27 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
+ *     Nuxeo - initial API and implementation
+ *
  */
-
 package org.nuxeo.virusscan.listeners;
 
 import java.io.Serializable;
 import java.util.List;
 
 import org.nuxeo.ecm.core.event.Event;
+import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.virusscan.VirusScanConsts;
 
 /**
  * Custom EventContext used to propagate info between the synchronous listener
  * and the Asynchrous listener
+ * <p/>
+ * The Blob xpaths are propagated using a List of String inside the
+ * {@link EventContext}.
  *
  * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
- * @since 5.6
  *
  */
 public class VirusScanEventContext extends DocumentEventContext {
