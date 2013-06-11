@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-Vendor: Nuxeo
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Bundle-Version: 5.7-I20130506_1515
+Bundle-Name: VirusScanListener
+Bundle-ManifestVersion: 2
+Nuxeo-Component: OSGI-INF/core-types-contrib.xml,
+ OSGI-INF/virusscan-service-contrib.xml,
+ OSGI-INF/listeners-contrib.xml
+Bundle-SymbolicName: VirusScanListener
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+
