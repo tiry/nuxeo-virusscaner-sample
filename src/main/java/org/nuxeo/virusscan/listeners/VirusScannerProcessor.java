@@ -90,9 +90,10 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
     }
 
     @Override
-    protected void handleEventLongRunning(List<String> eventNames,
+    protected boolean handleEventLongRunning(List<String> eventNames,
             Map<String, Object> data) throws ClientException {
 
+        boolean doContinue = false;
         ScanService scanService = Framework.getLocalService(ScanService.class);
 
         for (String key : data.keySet()) {
@@ -102,6 +103,7 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
             for (String path : blobs.keySet()) {
                 try {
                     results.put(path, scanService.scanBlob(blobs.get(path)));
+                    doContinue = true;
                 } catch (Exception e) {
                     log.error("Error calling ScanService", e);
                     results.put(
@@ -112,6 +114,8 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
             }
             data.put(key, results);
         }
+
+        return doContinue;
     }
 
     @Override

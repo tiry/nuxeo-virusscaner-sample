@@ -88,7 +88,7 @@ public abstract class AbstractLongRunningListener implements
             // do main-processing in a non transactional context
             // a new CoreSession will be open by ReconnectedEventBundleImpl
             try {
-                handleEventLongRunning(
+                doContinue = handleEventLongRunning(
                         ((ReconnectedEventBundleImpl) events).getEventNames(),
                         data);
             } catch (ClientException e) {
@@ -98,6 +98,10 @@ public abstract class AbstractLongRunningListener implements
                 throw e;
             } finally {
                 ((ReconnectedEventBundleImpl) events).disconnect();
+            }
+
+            if (!doContinue) {
+                return;
             }
 
             // do final-processing in a new transaction
@@ -141,9 +145,10 @@ public abstract class AbstractLongRunningListener implements
      *
      * @param eventNames list of event names
      * @param data an map that may have been filled by handleEventPreprocessing
+     * @return true of processing should continue, false otherwise
      * @throws ClientException
      */
-    protected abstract void handleEventLongRunning(List<String> eventNames,
+    protected abstract boolean handleEventLongRunning(List<String> eventNames,
             Map<String, Object> data) throws ClientException;
 
     /**
