@@ -71,6 +71,9 @@ public class VirusScannerProcessor extends AbstractLongRunningListener {
                 VirusScanEventContext vContext = VirusScanEventContext.unwrap((DocumentEventContext) event.getContext());
                 DocumentModel doc = vContext.getSourceDocument();
 
+                if (doc.isVersion() || doc.isImmutable()) {
+                    continue;
+                }
                 String key = doc.getRepositoryName() + ":" + doc.getId();
                 Map<String, Blob> blobs = (Map<String, Blob>) data.get(key);
                 if (blobs == null) {
